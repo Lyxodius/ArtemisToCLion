@@ -5,8 +5,8 @@
 
 #define INPUT_BUFFER_SIZE 512
 
-int file_exists(const char *d) {
-    return access(d, F_OK) == 0;
+int file_exists(const char *s) {
+    return access(s, F_OK) == 0;
 }
 
 char *concatenate_strings(const char *s1, const char *s2) {

@@ -54,6 +54,12 @@ void remove_recursively(char *path) {
     }
 }
 
+char *build_git_command(char *repository_path, char *path_to_assume_unchanged) {
+    return concatenate_strings(concatenate_strings(concatenate_strings("git --git-dir \"", repository_path),
+                                                   ".git\" update-index --assume-unchanged "),
+                               path_to_assume_unchanged);
+}
+
 int main() {
     setbuf(stdout, 0);
     printf("**************************************************\n");
@@ -135,6 +141,26 @@ int main() {
         } else {
             printf("Keine .c-Dateien gefunden.\n");
         }
+
+        char *gitignore_path = concatenate_strings(path, ".gitignore");
+        FILE *gitignore = fopen(gitignore_path, "w");
+        fprintf(gitignore, "/.idea/\ncmake*");
+        fclose(gitignore);
+        if (file_exists(gitignore_path)) {
+            printf(".gitignore aktualisiert.\n");
+            actions++;
+        } else {
+            printf("Konnte .gitignore nicht aktualisieren.\n");
+        }
+
+        char *gitignore_command = build_git_command(path, ".gitignore");
+        system(gitignore_command);
+        char *all_run_command = build_git_command(path, ".run/all.run.xml");
+        system(all_run_command);
+        char *makefile_command = build_git_command(path, "Makefile");
+        system(makefile_command);
+        printf("Fuer Aufgaben irrelevante Dateien werden von git ignoriert.\n");
+
         printf("------------------------------------------------------------\n\n");
 
         if (actions > 0) {
